@@ -20,6 +20,9 @@
             }
      </style>    
 <script>
+
+
+
         var map;
         var capa1;
         function init(){
@@ -34,6 +37,9 @@
             minZoom : 1,
             attribution : 'OSM'
             });
+
+
+            
             capa1.addTo(map);
             L.marker([41.3954, 2.16859],{
                 draggable:true
@@ -58,6 +64,11 @@
                           });  
         }
         </script>
+
+
+
+
+
 </head>
     <body onload="init()">
     <div id="map"></div>
