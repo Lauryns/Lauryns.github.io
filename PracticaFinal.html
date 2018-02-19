@@ -1,0 +1,209 @@
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title>Recursos turismo</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <link rel="shortcut icon" type="image/x-icon" href="faviconInfo.png" />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            text-align: left;
+            font-family: Century Gothic;
+            font-size: 15px;
+            color: rgb(1, 80, 117);
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%
+        }
+
+        .markerMap {
+            margin: 0 15px;
+
+            width: 20px;
+        }
+
+        h2 {
+            text-align: left;
+            font-family: Century Gothic;
+            font-size: 15px;
+            color: rgb(1, 80, 117);
+            vertical-align: center;
+        }
+
+        .legend {
+            background-color: #fff;
+            border-radius: 3px;
+            bottom: 30px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            padding: 10px;
+            position: absolute;
+            right: 10px;
+            z-index: 1;
+        }
+
+        .legend h4 {
+            margin: 0 0 10px;
+        }
+
+        .legend p {
+            margin-left: 30px;
+            position: absolute;
+            display: block;
+            top: 0;
+        }
+
+        .legend div {
+            position: relative;
+        }
+
+        .legend div span {
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            opacity: 0.8;
+            background-color: #d49a66;
+        }
+
+        .map-overlay {
+            font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            position: absolute;
+            width: 25%;
+            top: 0;
+            left: 0;
+            padding: 10px;
+            z-index: 100;
+        }
+
+        .map-overlay .map-overlay-inner {
+            background-color: #ffffff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
+            border-radius: 3px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .map-overlay input {
+            background-color: transparent;
+            display: inline-block;
+            width: 100%;
+            position: relative;
+            margin: 0;
+            cursor: ew-resize;
+        }
+    </style>
+    <script>
+
+        var tipusTransport = ["Tramvia", "RENFE", "Tren a l'aeroport", "Funicular", "Estació marítima", "Ferrocarrils Generalitat (FGC)", "Metro i línies urbanes FGC", "Telefèric"];
+        var colorTransport = ['#fd9c0a', '#e26131', '#f3f703', '#0381f7', '#9e78d3', '#d378cd', '#d37878', '#109010'];
+        $(document).ready(function () {
+            mapboxgl.accessToken = 'pk.eyJ1IjoibGF1cnlucyIsImEiOiJjamNqZ29jZTQwZG11MnFseHdmMGNsZDBtIn0.kxnzNQzDLNLez29GkIBH_A';
+            var map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/lauryns/cjdmzc68r22jj2ss34porow3l',
+                center: [2.1685, 41.3954],
+                zoom: 13,
+            });
+            var popup = new mapboxgl.Popup({ closeOnClick: false })
+                .setLngLat([2.170044, 41.387025])
+                .setHTML('<img class="markerMap" src="images/iconPerson3.png">' + '<h2>' + 'Què necessito?' + '</h2>')
+                .addTo(map);
+            map.on('click', 'localstipus-bcn-6gvgr7', function (e) {
+                var coordinates = e.features[0].geometry.coordinates.slice();
+                console.info(e.features[0]);
+                var description = e.features[0].properties.N_LOCAL;
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+            });
+            map.on('mouseenter', 'localstipus-bcn-6gvgr7', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'localstipus-bcn-6gvgr7', function () {
+                map.getCanvas().style.cursor = '';
+            });
+            map.addControl(new mapboxgl.NavigationControl());
+            map.on('load', function () {
+                map.addSource("transports_source", {
+                    type: "vector",
+                    url: "mapbox://lauryns.1zlw0xtl"
+                });
+                map.addLayer({
+                    id: "transports",
+                    type: "circle",
+                    source: "transports_source",
+                    'source-layer': "Transports-Bcn-664ar1",
+                    paint: {
+                        'circle-radius': 5,
+                        'circle-color': {
+                            property: "NOM_CAPA",
+                            type: 'categorical',
+                            stops: [
+                                [tipusTransport[0], colorTransport[0]],
+                                [tipusTransport[1], colorTransport[1]],
+                                [tipusTransport[2], colorTransport[2]],
+                                [tipusTransport[3], colorTransport[3]],
+                                [tipusTransport[4], colorTransport[4]],
+                                [tipusTransport[5], colorTransport[5]],
+                                [tipusTransport[6], colorTransport[6]],
+                                [tipusTransport[7], colorTransport[7]]
+                            ]
+                        },
+                        'circle-opacity': 1
+                    }
+                    , filter: ['==', 'NOM_CAPA', tipusTransport[0]]
+                });
+                creaLeyenda();
+                $('#slider').on('change', function (e) {
+                    filtratipus($(this).val());
+                });
+            });
+            function creaLeyenda() {
+                for (i = 0; i < tipusTransport.length; i++) {
+                    jQuery('#legend').append(
+                        '<div><span style="background-color:' + colorTransport[i] + ';width:10px;height:10px;margin: 0 5px"></span>' + tipusTransport[i] + '</div>'
+                    );
+                }
+            }
+            function filtratipus(numtipus) {
+                if (numtipus == 8) {
+
+                    var filters = ['!=', 'NOM_CAPA', ' '];
+                    map.setFilter('transports', filters);
+                    document.getElementById('transportsid').textContent = 'Todos';
+                } else {
+                    var filters = ['==', 'NOM_CAPA', tipusTransport[numtipus]];
+                    map.setFilter('transports', filters);
+                    document.getElementById('transportsid').textContent = tipusTransport[numtipus];
+                }
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <div id='legend' class='legend'>
+        <h2>Transports</h2>
+    </div>
+    <div class='map-overlay top'>
+        <div class='map-overlay-inner'>
+            <h2>Tipus de transport</h2>
+            <label id='transportsid'></label>
+            <input id='slider' type='range' min='0' max='7' step='1' value='0' />
+        </div>
+    </div>
+    <div id="map"></div>
+</body>
+
+</html>
